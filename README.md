@@ -92,8 +92,8 @@ An interactive "Real vs. Scam" quiz module that awards XP and ranks (Novice to C
 
 ### Prerequisites
 *   Node.js (v18 or higher)
-*   Google Gemini API Key: AIzaSyA8S4YQTf0Tu-ChZK4UydeCUHSLxVucGg8
-*   Lingo.dev API Key: api_nhylbwi8dend1l05hznzoxof
+*   Google Gemini API Key:
+*   Lingo.dev API Key
 
 ### Installation
 
