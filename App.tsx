@@ -4,13 +4,14 @@ import {
   Shield, AlertTriangle, CheckCircle, Loader2, Menu, X, 
   Info, Phone, FileText, Image as ImageIcon, Send, Copy,
   MapPin, Users, Mic, Landmark, ExternalLink, Activity, Zap, Eye,
-  Package, Box, Gamepad2, Award, Mail, ArrowLeft, Home
+  Package, Box, Gamepad2, Award, Mail, ArrowLeft, Home, Globe
 } from 'lucide-react';
-import { Language, AppView } from './types';
+import { Language, AppView, TranslationSet } from './types';
 import { TRANSLATIONS } from './constants';
 import LanguageSelector from './components/LanguageSelector';
 import FileUploader from './components/FileUploader';
 import { analyzeContent } from './services/geminiService';
+import { fetchDynamicTranslations } from './services/lingoService';
 import { SaifLogo } from './components/Logo';
 import LandingPage from './components/LandingPage';
 
@@ -19,6 +20,10 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>('landing');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
+  // Translation State
+  const [t, setT] = useState<TranslationSet>(TRANSLATIONS['English']);
+  const [isTranslating, setIsTranslating] = useState(false);
+
   // Scanner States
   const [activeTab, setActiveTab] = useState<'image' | 'text'>('image');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -50,7 +55,24 @@ const App: React.FC = () => {
   const [gameQuestion, setGameQuestion] = useState(0);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
 
-  const t = TRANSLATIONS[language];
+  // Translation Effect
+  useEffect(() => {
+    // 1. Immediate update from constants (fallback/cache)
+    const fallback = TRANSLATIONS[language] || TRANSLATIONS['English'];
+    setT(fallback);
+
+    // 2. Fetch dynamic translations from Lingo.dev API if not English
+    if (language !== 'English') {
+      setIsTranslating(true);
+      fetchDynamicTranslations(TRANSLATIONS['English'], language)
+        .then((dynamicTranslations) => {
+          if (dynamicTranslations) {
+            setT(dynamicTranslations);
+          }
+        })
+        .finally(() => setIsTranslating(false));
+    }
+  }, [language]);
 
   // Simulation Effects
   useEffect(() => {
@@ -444,7 +466,14 @@ const App: React.FC = () => {
                     <span className="text-xs font-bold text-slate-300">{t.email_police}</span>
                 </a>
             </div>
-            <LanguageSelector current={language} onSelect={setLanguage} label={t.select_lang_label} />
+            <div className="relative">
+              {isTranslating && (
+                <div className="absolute -top-6 right-0 text-[10px] text-cyan-500 flex items-center gap-1 animate-pulse">
+                   <Globe className="w-3 h-3" /> Updating translations...
+                </div>
+              )}
+              <LanguageSelector current={language} onSelect={setLanguage} label={t.select_lang_label} />
+            </div>
           </div>
         </div>
       </aside>
