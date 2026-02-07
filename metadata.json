@@ -1,0 +1,7 @@
+{
+  "name": "Saif-AI: UAE Scam Shield The Final",
+  "description": "An enterprise-grade cybersecurity agent powered by Gemini to analyze screenshots of suspicious messages and protect UAE residents from scams.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
